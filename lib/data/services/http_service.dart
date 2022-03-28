@@ -11,10 +11,10 @@ import 'package:cbs_architecture/data/config/const/api_const.dart';
 import 'package:cbs_architecture/data/utils/app_logger_util.dart';
 
 class HttpService {
-  Dio _dio;
+  Dio? _dio;
+
   static Future init() async {
     final getIt = GetIt.instance;
-
     getIt.registerSingleton<HttpService>(HttpService());
     await getIt<HttpService>().create();
   }
@@ -22,14 +22,21 @@ class HttpService {
   Future create() async {
     if (_dio == null) {
       _dio = Dio();
-      (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (client) {
-        client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+      (_dio!.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+          (client) {
+        client.badCertificateCallback =
+            (X509Certificate cert, String host, int port) => true;
       };
     }
   }
 
   // ignore: missing_return
-  Future<Response> post({String path, Map<String, dynamic> fields, String token, dynamic data}) async {
+  Future<Response?> post({
+    String? path,
+    Map<String, dynamic>? fields,
+    String? token,
+    dynamic data,
+  }) async {
     try {
       var body;
       if (fields == null) {
@@ -37,14 +44,14 @@ class HttpService {
       } else {
         body = fields;
       }
-      AppLoggerUtil.d("API: ${APIConst.API_URL + path} $data");
+      AppLoggerUtil.d("API: ${APIConst.API_URL + path!} $data");
       if (token == null) {
-        return await _dio.post(
+        return await _dio!.post(
           APIConst.API_URL + path,
           data: body,
         );
       } else {
-        return await _dio.post(
+        return await _dio!.post(
           APIConst.API_URL + path,
           data: data,
           options: Options(
@@ -57,15 +64,20 @@ class HttpService {
     }
   }
 
-  Future<dynamic> get({String path, String url, Map<String, dynamic> parameters, String token}) async {
+  Future<dynamic> get(
+      {String? path,
+      String? url,
+      Map<String, dynamic>? parameters,
+      String? token}) async {
     try {
       if (url == null) {
-        AppLoggerUtil.d("API: ${APIConst.API_URL + path}\n Parameters: $parameters");
+        AppLoggerUtil.d(
+            "API: ${APIConst.API_URL + path!}\n Parameters: $parameters");
         if (parameters == null) {
           if (token == null) {
-            return await _dio.get(APIConst.API_URL + path);
+            return await _dio!.get(APIConst.API_URL + path);
           } else {
-            return await _dio.get(
+            return await _dio!.get(
               APIConst.API_URL + path,
               options: Options(
                 headers: {"Authorization": "Token $token"},
@@ -73,11 +85,12 @@ class HttpService {
             );
           }
         }
-        return await _dio.get(APIConst.API_URL + path, queryParameters: parameters);
+        return await _dio!
+            .get(APIConst.API_URL + path, queryParameters: parameters);
       } else {
         AppLoggerUtil.d("API: $url\n Parameters: $parameters");
-        if (parameters == null) return await _dio.get(url);
-        return await _dio.get(url, queryParameters: parameters);
+        if (parameters == null) return await _dio!.get(url);
+        return await _dio!.get(url, queryParameters: parameters);
       }
     } catch (e) {
       AppLoggerUtil.e(e.toString());

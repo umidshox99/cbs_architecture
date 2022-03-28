@@ -1,17 +1,16 @@
-// 🐦 Flutter imports:
 import 'package:flutter/material.dart';
-
-// 📦 Package imports:
 import 'package:get_it/get_it.dart';
 
 class NavigatorService {
-  GlobalKey<NavigatorState> _key;
+  late GlobalKey<NavigatorState> _key;
+
   GlobalKey<NavigatorState> get key => _key;
 
-  static Future init() async {
-    final getIt = GetIt.instance;
+  static NavigatorService get to => GetIt.I<NavigatorService>();
 
-    getIt.registerSingleton<NavigatorService>(NavigatorService());
+  static Future init() async {
+    final getIt = GetIt.instance
+      ..registerSingleton<NavigatorService>(NavigatorService());
     await getIt<NavigatorService>().create();
   }
 
@@ -19,25 +18,76 @@ class NavigatorService {
     _key = GlobalKey<NavigatorState>();
   }
 
-  Future<dynamic> pushNamed(String routeName, {Object arguments}) {
-    return _key.currentState.pushNamed(
+  Future<T?> pushNamed<T extends Object?>(
+    String routeName, {
+    Object? arguments,
+  }) {
+    return _key.currentState!.pushNamed(
       routeName,
       arguments: arguments,
     );
   }
 
-  Future<dynamic> pushReplacementNamed(String routeName, {Object arguments}) {
-    return _key.currentState.pushReplacementNamed(
+  Future<T?> push<T extends Object?>(Route<T> route) {
+    return _key.currentState!.push(route);
+  }
+
+  void popUntil(RoutePredicate predicate) {
+    _key.currentState!.popUntil(predicate);
+  }
+
+  void pop<T extends Object?>([T? result]) {
+    _key.currentState!.pop(result);
+  }
+
+  Future<T?> pushReplacement<T extends Object?, TO extends Object?>(
+    Route<T> newRoute, {
+    TO? result,
+  }) {
+    return _key.currentState!.pushReplacement(newRoute, result: result);
+  }
+
+  Future<T?> pushReplacementNamed<T extends Object?, TO extends Object?>(
+    String routeName, {
+    TO? result,
+    Object? arguments,
+  }) {
+    return _key.currentState!.pushReplacementNamed(
       routeName,
+      arguments: arguments,
+      result: result,
+    );
+  }
+
+  Future<T?> pushNamedAndRemoveUntil<T extends Object?>(
+    String newRouteName, {
+    RoutePredicate? predicate,
+    Object? arguments,
+  }) {
+    return _key.currentState!.pushNamedAndRemoveUntil(
+      newRouteName,
+      predicate ?? (_) => false,
       arguments: arguments,
     );
   }
 
-  void pop([result]) {
-    _key.currentState.maybePop(result);
+  Future<T?> popAndPushNamed<T extends Object?, TO extends Object?>(
+    String routeName, {
+    TO? result,
+    Object? arguments,
+  }) {
+    return _key.currentState!.popAndPushNamed(
+      routeName,
+      result: result,
+      arguments: arguments,
+    );
   }
 
-  bool canPop([result]) {
-    return _key.currentState.canPop();
+  Future<bool> maybePop<T extends Object?>([T? result]) async {
+    return _key.currentState!.maybePop(result);
+  }
+
+  bool canPop() {
+    return _key.currentState!.canPop();
   }
 }

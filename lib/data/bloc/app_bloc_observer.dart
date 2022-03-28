@@ -1,31 +1,22 @@
-// 📦 Package imports:
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-// 🌎 Project imports:
 import 'package:cbs_architecture/data/utils/app_logger_util.dart';
 
 class AppBlocObserver extends BlocObserver {
   @override
-  void onEvent(Bloc bloc, Object event) {
-    // AppLoggerUtil.d('onEvent: $bloc => $event');
-    super.onEvent(bloc, event);
+  void onChange(BlocBase bloc, Change change) {
+    super.onChange(bloc, change);
+    AppLoggerUtil.i('onChange(${bloc.runtimeType}, $change)');
   }
 
   @override
   void onError(BlocBase bloc, Object error, StackTrace stackTrace) {
-    AppLoggerUtil.d('$bloc => $error');
+    AppLoggerUtil.e('onError(${bloc.runtimeType}, $error, $stackTrace)');
     super.onError(bloc, error, stackTrace);
   }
 
   @override
-  void onTransition(Bloc bloc, Transition transition) {
-    AppLoggerUtil.d('$bloc => $transition');
-    super.onTransition(bloc, transition);
-  }
-
-  @override
-  void onChange(BlocBase bloc, Change change) {
-    // AppLoggerUtil.d('$bloc => $change');
-    super.onChange(bloc, change);
+  void onClose(BlocBase bloc) {
+    AppLoggerUtil.i('onClose(${bloc.runtimeType})');
+    super.onClose(bloc);
   }
 }

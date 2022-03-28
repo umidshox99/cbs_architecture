@@ -9,7 +9,7 @@ import 'package:hive/hive.dart';
 import 'package:cbs_architecture/data/localization/locale_keys.g.dart';
 
 class HiveService {
-  Box _box;
+  late Box _box;
   static Future init() async {
     final getIt = GetIt.instance;
 
